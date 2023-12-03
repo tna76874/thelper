@@ -31,7 +31,7 @@ function ensure_executeables() {
     # Füge die Zeilen zur Datei hinzu
     sudo tee "$executablepathxampp" > /dev/null <<EOF
 podman pull $IMAGE > /dev/null 2>&1 || :
-podman run -v \$HOME/.config/thelper:/config/.config/thelper -v \$PWD:/work thelper:latest "\$@"
+podman run --userns=keep-id -v \$HOME/.config/thelper:/config/.config/thelper -v \$PWD:/work $IMAGE "\$@"
 EOF
 
     sudo chmod +x $executablepathxampp

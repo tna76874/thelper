@@ -1,3 +1,2 @@
 #!/bin/bash
-
-docker build -t thelper:latest .
+podman build -t thelper:edge .

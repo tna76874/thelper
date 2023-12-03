@@ -7,5 +7,5 @@ if [[ "$1" == "bash"  ]]; then
 elif [[ "$extension" == "py"  ]]; then
     /usr/local/bin/python ./"$@"
 else
-    /usr/local/bin/thelper "$@"
+    thelper "$@"
 fi
