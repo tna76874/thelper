@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@author: lmh
+"""
+from thelper import *
+from thelper.figures import *
+
+# symbolische Funktion definieren
+x = sp.symbols('x', real=True)
+f = sp.Rational(1,2)*x**2
+f2 = f*sp.Rational(1,2)
+
+# Figure Objekt initialisieren
+F = plotfig(h=1,v=1,scale=1.2,sharex=True,sharey=True,wspace = 0.2,hspace = 0.2,figsize=[5,4])
+F.set_fontsize(10)
+
+# Gitterlinien festlegen
+F.grid([1,0.5,1,0.5])
+
+# plotten
+F.symplot(f,f2)
+
+# Plotstyle setzen
+F.arrowed_spines(equal=True,lims=[-3,3,0,5])
+
+# Funktionen beschriften
+F.ax[0].annotate(r"$f(x) = {:}$".format(sp.latex(f)), xy=(1,0), xytext=(3, f.subs(x,3)), ha='right', va='center', bbox=dict(facecolor='white', alpha=1, edgecolor='white', boxstyle='round'))
+F.ax[0].annotate(r"$g(x) = {:}$".format(sp.latex(f2)), xy=(1,0), xytext=(3, f2.subs(x,3)), ha='right', va='center', bbox=dict(facecolor='white', alpha=1, edgecolor='white', boxstyle='round'))
+
+# Speichern
+F.save('parabel1')

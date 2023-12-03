@@ -1,0 +1,26 @@
+{% raw %}\newcommand{\docautor}{ {% endraw %}{{ author }}{% raw %} }
+\newcommand{\doctitle}{DOCTITLE}
+\newcommand{\docsubject}{DOCSUBJECT}
+
+\newcommand{\cright}{Copyright (C) \today by \docautor.  All rights reserved.}
+
+\hypersetup{pdfauthor={\docautor}, 
+	pdftitle={\doctitle}, 
+	pdfsubject={\docsubject}, 
+	pdfcreator={LaTeX}, 
+	pdfproducer={LaTeX}, 
+	pdfkeywords={Stand \today}, 
+	pdfcopyright={\cright}}
+
+\pagestyle{fancy}
+\fancyheadoffset{1cm} 
+\fancyhf{}
+\fancyhead[LE,RO]{}
+\fancyhead[RE,LO]{}
+\fancyhead[CO,CE]{}
+\fancyfoot[CE,CO]{\leftmark}
+\fancyfoot[CE,CO]{\thepage}
+\fancyfoot[R]{}
+\fancyfoot[L]{}
+
+{% endraw %}

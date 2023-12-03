@@ -1,0 +1,95 @@
+{% raw %}\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	total={170mm,257mm},
+	left=20mm,
+	top=20mm,
+}
+\usepackage{amsmath,amssymb}
+\usepackage{bbm}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\sisetup{ 
+	per=frac 
+	,repeatunits = false 
+	,trapambigrange=false 
+	, tophrase = - 
+	,loctolang=DE:ngerman 
+	,decimalsymbol=comma 
+} 
+\usepackage{bbding}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{rotating}
+\usepackage{hyperref}
+\usepackage{hyperxmp}
+\usepackage{ifthen}
+\usepackage{catchfilebetweentags}
+
+
+\setlength\parindent{0pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BAIER KAROGRID
+% A 0.5cm grid at given text
+\newcommand{\getpagetotal}{\the\pagetotal}
+\newcommand{\gettextheight}{\the\textheight}
+\newcommand{\getbaselineskip}{\the\baselineskip}
+%grid command
+\ProvideDocumentCommand{\karogrid}{O{0}}{
+\par
+
+
+\pgfmathsetmacro{\theight}{scalar(\gettextheight)}
+\pgfmathsetmacro{\pat}{scalar(\getpagetotal)}
+\pgfmathsetmacro{\bsskip}{scalar(\getbaselineskip)}
+
+\dimendef\gridwidth=0
+\pgfmathsetlength{\gridwidth}{1 cm * floor(scalar(\textwidth)*0.0352778) }
+
+\ifnum#1=0
+\pgfmathsetmacro{\gridheight}{1 cm * floor((\theight-\pat-\bsskip)*0.0352778) }
+\else
+\pgfmathsetmacro{\gridheight}{1 cm *#1 }
+\fi
+\begin{center}
+\begin{tikzpicture}
+\tikz
+\coordinate (A) at (canvas cs:x=\gridwidth,y=\gridheight) {};
+\draw[step=0.5cm, color=gray] (0cm ,0 cm ) grid (canvas cs:x=\gridwidth,y=\gridheight);
+\end{tikzpicture}%
+\end{center}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Definitionen für Karomuster und liniert
+\newcommand\kariert[2][0.5cm]{% 
+	\begin{tikzpicture}[gray,step=#1]
+	\pgfmathtruncatemacro\anzahl{(\linewidth-\pgflinewidth)/#1} % maximale Anzahl Kästchen pro Zeile
+	\draw (0,0) rectangle (\anzahl*#1,#2*#1) (0,0) grid (\anzahl*#1,#2*#1);
+	\end{tikzpicture} 
+}
+\newcommand{\liniert}[2][0.5cm]{% 
+	\begin{tikzpicture}[gray]
+	\path[use as bounding box](0,0)rectangle(\linewidth,-#2*#1-0.5\pgflinewidth); 
+	\foreach \n in {1,...,#2}\draw(0 ,-#1*\n )--(\linewidth,-#1*\n ); 
+	\end{tikzpicture}}
+\newcommand{\emptybox}[2]{%
+	\raisebox{-0.25\baselineskip}{	
+		\begingroup
+		\setlength{\fboxsep}{-\fboxrule}%
+		\noindent\framebox[#1]{\rule{0pt}{#2}}%
+		\endgroup}
+}
+
+% Helvetica font
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+{% endraw %}

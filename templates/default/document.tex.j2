@@ -1,0 +1,15 @@
+{% raw %}\documentclass[a4paper]{article}
+\usepackage{thelper}
+
+\input{meta.tex}
+
+%%%%%%%%%%%%%%% IMPORTING PIPELINE TEX FILE IF PRESENT %%%%%
+\IfFileExists{pipeline.tex}{\input{pipeline.tex}}{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Hauptdokument
+\begin{document}
+\IfFileExists{content.tex}{\input{content.tex}}{EMPTY}
+\end{document}
+{% endraw %}
+
