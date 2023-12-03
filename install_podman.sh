@@ -30,7 +30,9 @@ function ensure_executeables() {
 
     # Füge die Zeilen zur Datei hinzu
     sudo tee "$executablepathxampp" > /dev/null <<EOF
+echo -e "Pulling latest image . . ."
 podman pull $IMAGE > /dev/null 2>&1 || :
+echo -e ". . . done"
 podman run --userns=keep-id -v \$HOME/.config/thelper:/config/.config/thelper -v \$PWD:/work $IMAGE "\$@"
 EOF
 
