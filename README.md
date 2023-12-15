@@ -14,6 +14,16 @@ Installation with Anaconda:
 
 *Linux*: `./install_local.sh -i`
 
+##### Pip
+
+To install via pip:
+
+```
+pip install git+https://github.com/tna76874/thelper.git
+```
+
+You might add the templates in the corresponding folder `~/.config/thelper` manually.
+
 ##### Docker
 
 ```bash
