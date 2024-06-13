@@ -112,7 +112,7 @@ class plotfig(object):
                 ax.xaxis.set_minor_locator(plt.MultipleLocator(grain[1]))
             if grain[3]!= None:
                 ax.yaxis.set_minor_locator(plt.MultipleLocator(grain[3]))
-            ax.grid(True,which='both')
+            ax.grid(True,which='both', zorder=-1)
 
     def get_ax(self,ax=None,idx='all'):
         if isinstance(idx,str):
@@ -134,7 +134,15 @@ class plotfig(object):
         
         if equal: _ = [ ax.set_aspect('equal') for ax in axes ]
             
-            
+    def _annotate(self, label, x, y, ax=None, offset=0, idx='all'):
+        axes = self.get_ax(ax=ax, idx='all')
+        for ax in axes:
+            ax.annotate(label, xy=(x, y+offset), xytext=(x, y+offset), ha='right', va='center', bbox=dict(facecolor='white', alpha=1, edgecolor='white', boxstyle='round'))
+
+    def annotate(self, label, x, func, ax=None, offset=0):
+        y = sp.N(func.subs(self.x, x))
+        self._annotate(label, x, y, ax=ax, offset=offset)
+
     def arrowed_spines_for_ax(self, ax):
         # https://matplotlib.org/stable/gallery/spines/centered_spines_with_arrows.html
         # Move the left and bottom spines to x = 0 and y = 0, respectively.
