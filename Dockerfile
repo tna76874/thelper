@@ -33,7 +33,7 @@ ENV PATH=$PATH:/config/.local/bin
 RUN pip install . --user &\
     pip install -r requirements.txt --user
 
-WORKDIR /home/${UNAME}
+WORKDIR /work
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
