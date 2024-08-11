@@ -207,6 +207,9 @@ class thelper(object):
         template = env.get_template(self.config['TEMPLATES'][tkey])        
         template_out = template.render(template_vars)
         
+        if template_out=='':
+            return
+        
         renderfile = os.path.join(os.getcwd(), self.get_render_filename(tkey))
         if not os.path.exists(renderfile):
             with open(renderfile, "w",encoding="utf8") as myfile:
