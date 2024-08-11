@@ -1,4 +1,4 @@
-FROM ghcr.io/tna76874/schoolnotebookjava:stable
+FROM python:3.9
 
 USER root
 
@@ -18,6 +18,7 @@ RUN useradd -m -u $UID -g $GID -o -s /bin/bash -d /config $UNAME
 
 RUN mkdir /build
 COPY . /build
+COPY docker-entrypoint.sh /
 
 RUN chmod 775 /docker-entrypoint.sh &&\
     chown -R $UNAME:$UNAME /build &&\
@@ -33,4 +34,6 @@ RUN pip install . --user &\
     pip install -r requirements.txt --user
 
 WORKDIR /home/${UNAME}
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
