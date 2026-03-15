@@ -80,38 +80,36 @@ class thelper(object):
                 
     def run_config_file(self) -> None:
         """
-        The central config file from the HOME directory will be loaded if exist.
-        Otherwise a config file will be created.
-
-        Returns
-        -------
-        None
-
+        Load or create YAML config file.
         """
-        self.args['conffile'] = os.path.join(self.args['confdir'],'config.ini')
-            
-        if os.path.isfile(self.args['conffile']):
-            self.config = configparser.ConfigParser()
-            self.config.read(self.args['conffile'])
-            self.config['SETTINGS']['defaulttemplate']=self.args['d']
-            self.rendervars.update(dict(self.config['VARIABLES']))
-        else:
-            self.config = configparser.ConfigParser()
-            self.config['SETTINGS'] =       {
-                                            'templatebasedir'           : "templates",
-                                            'defaulttemplate'           : self.args['d'],
-                                            }
-            self.config['TEMPLATES'] =      {
-                                            'main_template'             : "document.tex.j2",
-                                            'style_template'            : "thelper.sty.j2",
-                                            'meta_template'             : "meta.tex.j2",
-                                            'python_template'           : "main.py.j2",
-                                            'content_template'          : "content.tex.j2",
-                                            }
-            self.config['VARIABLES'] =      self.rendervars
 
-            with open(self.args['conffile'], 'w') as savefile:
-                self.config.write(savefile)
+        self.args['conffile'] = os.path.join(self.args['confdir'], 'config.yml')
+
+        if os.path.isfile(self.args['conffile']):
+            with open(self.args['conffile'], "r") as f:
+                self.config = yaml.safe_load(f)
+
+            self.config['SETTINGS']['defaulttemplate'] = self.args['d']
+            self.rendervars.update(self.config['VARIABLES'])
+
+        else:
+            self.config = {
+                "SETTINGS": {
+                    "templatebasedir": "templates",
+                    "defaulttemplate": self.args['d']
+                },
+                "TEMPLATES": {
+                    "main_template": "document.tex.j2",
+                    "style_template": "thelper.sty.j2",
+                    "meta_template": "meta.tex.j2",
+                    "python_template": "main.py.j2",
+                    "content_template": "content.tex.j2"
+                },
+                "VARIABLES": self.rendervars
+            }
+
+            with open(self.args['conffile'], "w") as f:
+                yaml.dump(self.config, f, sort_keys=False)
                 
     def ensuring_template_dirs(self) -> None:
         """
@@ -130,27 +128,22 @@ class thelper(object):
             self.ensure_dir(self.args[i])
             
     def run_sub_config_file(self) -> None:
-        """
-        The config file from the current working directory will be loaded if exist.
-        Otherwise a config file will be created.
 
-        Returns
-        -------
-        None.
+        subconffile = os.path.join(os.getcwd(), 'config.yml')
 
-        """
-        subconffile = os.path.join(os.getcwd(),'config.ini')
-            
         if os.path.isfile(subconffile):
-            config = configparser.ConfigParser()
-            config.read(subconffile)
-            self.rendervars.update(dict(config['VARIABLES']))
-        else:
-            config = configparser.ConfigParser()
-            config['VARIABLES'] = self.rendervars
 
-            with open(subconffile, 'w') as savefile:
-                config.write(savefile)
+            with open(subconffile, "r") as f:
+                config = yaml.safe_load(f)
+
+            self.rendervars.update(config['VARIABLES'])
+
+        else:
+
+            config = {"VARIABLES": self.rendervars}
+
+            with open(subconffile, "w") as f:
+                yaml.dump(config, f, sort_keys=False)
 
     def get_render_variables(self) -> dict:
         """
@@ -248,6 +241,44 @@ class thelper(object):
                 self.render_latex_template(tkey,self.args['templatedir'])
             except:
                 self.render_latex_template(tkey,self.args['defaulttemplatedir'])
+
+    def convert_ini_to_yaml(self, ini_path: str, yaml_path: str = None) -> None:
+        """
+        Convert an existing config.ini file to config.yml.
+
+        Parameters
+        ----------
+        ini_path : str
+            Path to the source config.ini file.
+        yaml_path : str, optional
+            Path where the resulting config.yml should be written.
+            If None, the YAML file will be written next to the ini file.
+
+        Returns
+        -------
+        None
+        """
+
+        import configparser
+        import yaml
+
+        ini_path = os.path.abspath(ini_path)
+
+        if not os.path.isfile(ini_path):
+            raise FileNotFoundError(f"INI file not found: {ini_path}")
+
+        if yaml_path is None:
+            yaml_path = ini_path.replace(".ini", ".yml")
+
+        config = configparser.ConfigParser()
+        config.read(ini_path)
+
+        data = {section: dict(config[section]) for section in config.sections()}
+
+        with open(yaml_path, "w") as f:
+            yaml.dump(data, f, sort_keys=False)
+
+        print(f"Converted {ini_path} -> {yaml_path}")
         
 
 def main(headless=True):
@@ -256,9 +287,15 @@ def main(headless=True):
     parser.add_argument("-t", help="template category e.g. default", default='default' ,type=str)
     parser.add_argument("-d", help="default template category e.g. default", default='default' ,type=str)
     parser.add_argument("-r", help="render latex templates", action="store_true")
+    parser.add_argument("--convert-ini", help="convert an existing config.ini to config.yml", type=str)
 
 
     args = parser.parse_args()
+
+    if args.convert_ini:
+        helper = thelper(**vars(args))
+        helper.convert_ini_to_yaml(args.convert_ini)
+        return
   
     # init object
     if headless: _ = thelper(**vars(args))
