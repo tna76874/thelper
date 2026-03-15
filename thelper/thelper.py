@@ -244,27 +244,11 @@ class thelper(object):
                 self.render_latex_template(tkey,self.args['defaulttemplatedir'])
 
     def convert_ini_to_yaml(self, ini_path: str, yaml_path: str = None) -> None:
-        """
-        Convert an existing config.ini file to config.yml.
-
-        Parameters
-        ----------
-        ini_path : str
-            Path to the source config.ini file.
-        yaml_path : str, optional
-            Path where the resulting config.yml should be written.
-            If None, the YAML file will be written next to the ini file.
-
-        Returns
-        -------
-        None
-        """
-
         import configparser
         import yaml
+        import os
 
         ini_path = os.path.abspath(ini_path)
-
         if not os.path.isfile(ini_path):
             raise FileNotFoundError(f"INI file not found: {ini_path}")
 
@@ -275,6 +259,10 @@ class thelper(object):
         config.read(ini_path)
 
         data = {section: dict(config[section]) for section in config.sections()}
+
+        # ⚠️ Sicherstellen, dass YAML nicht leer ist
+        if not data:
+            data = {"SETTINGS": {}, "TEMPLATES": {}, "VARIABLES": {}}
 
         with open(yaml_path, "w") as f:
             yaml.dump(data, f, sort_keys=False)
