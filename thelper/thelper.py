@@ -179,35 +179,53 @@ class thelper(object):
             return self.rendervars['document']+'.tex'
         
             
-    def render_latex_template(self,tkey: str, tempdir: str ) -> None:
-        """
-        Render a single template file.
-
-        Parameters
-        ----------
-        tkey : str
-            The key of the config section 'TEMPLATES'.
-        tempdir : str
-            The foldername of the template category.
-
-        Returns
-        -------
-        None
-
-        """
-        env = Environment(loader=FileSystemLoader(tempdir))
-        template_vars = self.get_render_variables()
-        
-        template = env.get_template(self.config['TEMPLATES'][tkey])        
-        template_out = template.render(template_vars)
-        
-        if template_out=='':
-            return
-        
-        renderfile = os.path.join(os.getcwd(), self.get_render_filename(tkey))
-        if not os.path.exists(renderfile):
-            with open(renderfile, "w",encoding="utf8") as myfile:
-                myfile.write(template_out)         
+    def render_latex_template(self, tkey: str, tempdir: str) -> None:
+            """
+            Render a single template file or copy if it's a binary file.
+            Skips copying if the binary file is empty (0 bytes).
+            """
+            # 1. Dateinamen aus der Config holen
+            template_filename = self.config['TEMPLATES'][tkey]
+            source_path = os.path.join(tempdir, template_filename)
+            
+            # Prüfen, ob die Quelldatei existiert
+            if not os.path.exists(source_path):
+                raise FileNotFoundError(f"Template {template_filename} not found in {tempdir}")
+    
+            # 2. Zielpfad bestimmen
+            render_filename = self.get_render_filename(tkey)
+            renderfile = os.path.join(os.getcwd(), render_filename)
+    
+            # Falls die Datei im Zielverzeichnis bereits existiert, überspringen
+            if os.path.exists(renderfile):
+                return
+    
+    
+            # 3. Prüfung auf Binärdateien (Case-insensitive)
+            binary_extensions = ('.jpg', '.jpeg', '.png', '.pdf', '.gif', '.zip', '.docx', '.otf', '.ttf')
+            if template_filename.lower().endswith(binary_extensions):
+                
+                # --- NEU: Prüfung auf Dateigröße (0 Bytes) ---
+                if os.path.getsize(source_path) == 0:
+                    return
+                
+                # Kopieren der Binärdatei
+                shutil.copy2(source_path, renderfile)
+                return
+    
+            # 4. Normales Jinja2 Rendering für Textdateien
+            env = Environment(loader=FileSystemLoader(tempdir))
+            template_vars = self.get_render_variables()
+            
+            template = env.get_template(template_filename)        
+            template_out = template.render(template_vars)
+            
+            # Auch hier: Falls das Render-Ergebnis leer ist, nicht schreiben
+            if not template_out.strip():
+                return
+            
+            with open(renderfile, "w", encoding="utf8") as myfile:
+                myfile.write(template_out)
 
     def render_all_latex_templates(self) -> None:
         """
